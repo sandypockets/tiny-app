@@ -45,6 +45,22 @@ const findUserByCookie = (user_id) => {
   const user = users[user_id];
   return user;
 };
+
+// Return StatusCode 400 if email or password is blank
+// Implemented within the register POST in express_server.js
+// This func is not needed atm, but the program breaks when it is removed.
+const validateCreds = (userObj) => {
+  console.log("TESTING: ", userObj)
+  console.log("TESTING: ", userObj.email)
+  const user_id = userObj.id;
+  if (user_id) {
+    if (!userObj.email || !userObj.password) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+};
   
 const addNewURL = (longURL) => {
   const shortURL = generateRandomString();
@@ -59,4 +75,4 @@ const editURL = (shortURL, longURL) => {
   return shortURL;
 };
 
-module.exports = {urlDatabase, generateRandomString, addNewURL, editURL, users, createNewUser, findUserByCookie};
+module.exports = {urlDatabase, generateRandomString, addNewURL, editURL, users, createNewUser, findUserByCookie, validateCreds};

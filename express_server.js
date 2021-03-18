@@ -3,7 +3,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080;
 const bodyParser = require('body-parser');
-const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser, findUserByCookie} = require('./helpers')
+const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser, findUserByCookie, validateCreds} = require('./helpers')
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
@@ -26,6 +26,13 @@ app.get("/urls", (req, res) => {
   const user_id = req.cookies["user_id"];
   const userObj = findUserByCookie(user_id);
   const templateVars = { urls: urlDatabase, userObj: userObj};
+
+/*   if (!validateCreds(userObj)) {
+    //res.cookie('Status', 400);
+    res.status(400);
+    res.redirect('/register');
+  }; */
+
   console.log("USERID!!", user_id);
   console.log("USERS!!", users[user_id]);
   console.log("TEMPLATEVARS!!", templateVars);
@@ -117,6 +124,12 @@ app.post("/login", (req, res) => {
 app.post("/register", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
+
+  if (!username || !password) {
+    res.status(400);
+    res.send("Status: 400 - Invalid entry. Please enter a valid username or password.");
+  };
+
   res.cookie('password', password);
   createNewUser(username, password);
   let userKeys = Object.keys(users);
@@ -131,6 +144,14 @@ app.post("/register", (req, res) => {
     user_id: req.cookies["user_id"],
     userObj: userObj};
   console.log(userObj);
+
+ /*  if (!validateCreds(userObj)) {
+    //res.cookie('Status', 400);
+    res.status(400);
+    res.redirect('/register');
+  }; */
+
+    //res.clearCookie('Status', 400);
     res.redirect('/urls');
 });
 
