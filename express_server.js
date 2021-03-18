@@ -20,7 +20,6 @@ app.get("/urls.json", (req, res) => {
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
   res.render("urls_index", templateVars);
-  console.log(templateVars);
 });
 
 // Page to create new URL
@@ -51,6 +50,13 @@ app.get("/logout", (req, res) => {
   res.clearCookie('username');
   res.redirect("/login");
 });
+
+// Sign Up page
+app.get("/register", (req, res) => {
+  const templateVars = {username: req.cookies["username"]};
+  res.render("register", templateVars);
+});
+
 
 // ROUTES - POST
 // Create new shortURL
@@ -85,6 +91,17 @@ app.post("/login", (req, res) => {
   res.redirect('/urls');
 });
 
+// Register / Sign up
+app.post("/register", (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+  res.cookie('username', username);
+  res.cookie('password', password);
+  const templateVars = {username: req.cookies["username"], password: req.cookies["password"]};
+  res.redirect('/urls');
+});
+
+// UTILS
 // Server listening
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
