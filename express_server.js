@@ -143,23 +143,50 @@ app.post("/register", (req, res) => {
     res.status(400);
     res.redirect('/register');
   }; */
-
     //res.clearCookie('Status', 400);
     res.redirect('/urls');
 });
 
 // Login and set cookie
 app.post("/login", (req, res) => {
-  const username = req.body.username;
+  let userEmail = req.body.username;
+  console.log("useremail: ", userEmail);
+  let counter = 0;
+  let user_id;
+  let templateVars;
 
-  // This small block, and the template vars in the res.redirect are what is causing an error in the program. I believe this will be addressed in the next lesson, so I am leaving it as is for now. Otherwise delete these few lines and the program should work normally again.
+  // Email is being submitted properly. Just need to sort out the issue with this loop, and assigning the cookie.
+
+  for (let user in users) {
+    if (userEmail === user.email) {
+      user_id = user.id;
+      //res.cookies('user_id', user_id)
+      counter++;
+    }
+  } if (counter > 0) {
+    const userObj = findUserByCookie(user_id);
+    templateVars = {
+      user_id: user_id,
+      userObj: userObj
+    };
+  };
+  res.cookie('user_id', user_id);
+  //res.redirect('/urls', templateVars);
+  res.redirect('/urls');
+  });
+  
+  //const username = req.body.username;
+  //const user_id = req.cookies["user_id"];
+  /* const templateVars = {
+    username: req.cookies["username"],
+    password: req.cookies["password"],
+    user_id: req.cookies["user_id"],
+    userObj: userObj}; */
+/*   // This small block, and the template vars in the res.redirect are what is causing an error in the program. I believe this will be addressed in the next lesson, so I am leaving it as is for now. Otherwise delete these few lines and the program should work normally again.
   const user_id = req.body.user_id;
   const userObj = findUserByCookie(user_id);
-  const templateVars = {userObj: userObj};
-
-  res.cookie('username', username);
-  res.redirect('/urls', templateVars);
-});
+  const templateVars = {userObj: userObj}; */
+  //res.cookie('username', username);
 
 // UTILS
 // Server listening
