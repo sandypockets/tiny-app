@@ -1,20 +1,33 @@
-// Database of existing URLs
-const urlDatabase = {
+// Database of existing URLs V1
+/* const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
+};
+ */
+// Database of existing URLs, and their users - V2
+const urlDatabase = {
+  b2xVn2: { longURL: "http://www.lighthouselabs.ca", userID: "23l4kj"},
+  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" },
+  jh1hp9: { longURL: "https://www.yahoo.com", userID: "ay8l46" }
 };
 
 // Database of users
 const users = { 
-  "userRandomID": {
-    id: "userRandomID", 
+  "aJ48lW": {
+    id: "aJ48lW", 
     email: "user@example.com", 
     password: "purple-monkey-dinosaur"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
+ "ay8l46": {
+    id: "ay8l46", 
     email: "user2@example.com", 
     password: "dishwasher-funk"
+  },
+  "23l4kj": {
+    id: "23l4kj",
+    email: "test@test.com",
+    password: "test"
   }
 }
 
@@ -74,7 +87,15 @@ const validateCreds = (userObj) => {
     }
   }
 };
-  
+
+// Add new URL to user - testing in REPL
+const addNewUrlToUser = (longURL, user_id) => {
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = {longURL, user_id};
+  // This return statement might need work
+  return urlDatabase[shortURL];
+};
+
 const addNewURL = (longURL) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = longURL;
@@ -88,4 +109,4 @@ const editURL = (shortURL, longURL) => {
   return shortURL;
 };
 
-module.exports = {urlDatabase, generateRandomString, addNewURL, editURL, users, createNewUser, findUserByCookie, validateCreds, findUserByEmail};
+module.exports = {urlDatabase, generateRandomString, addNewURL, editURL, users, createNewUser, findUserByCookie, validateCreds, findUserByEmail, addNewUrlToUser};
