@@ -24,10 +24,16 @@ app.get("/users.json", (req, res) => {
 
 // List of URLs
 app.get("/urls", (req, res) => {
-  const user_id = req.cookies["user_id"];
-  const userObj = findUserByCookie(user_id);
-  const templateVars = { urls: urlDatabase, userObj: userObj};
-  res.render("urls_index", templateVars);
+  const user_id = req.cookies.user_id;
+  if (user_id) {
+    const user_id = req.cookies["user_id"];
+    const userObj = findUserByCookie(user_id);
+    const templateVars = { urls: urlDatabase, userObj: userObj};
+    res.render("urls_index", templateVars);
+    return;
+  } else {
+    res.redirect("login");
+  }
 });
 
 // Page to create new URL
