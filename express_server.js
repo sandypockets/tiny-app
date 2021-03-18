@@ -23,9 +23,12 @@ app.get("/users.json", (req, res) => {
 
 // List of URLs
 app.get("/urls", (req, res) => {
-  const user_id = req.body.user_id;
+  const user_id = req.cookies["user_id"];
   const userObj = findUserByCookie(user_id);
   const templateVars = { urls: urlDatabase, userObj: userObj};
+  console.log("USERID!!", user_id);
+  console.log("USERS!!", users[user_id]);
+  console.log("TEMPLATEVARS!!", templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -97,7 +100,7 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
-  const user_id = req.body.user_id;
+  //const user_id = req.body.user_id;
   const shortURL = req.params.shortURL;
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect(`/urls/${shortURL}/edit`);
