@@ -3,7 +3,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080;
 const bodyParser = require('body-parser');
-const {generateRandomString, addNewURL, editURL, urlDatabase} = require('./helpers')
+const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser} = require('./helpers')
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
@@ -16,46 +16,54 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+// .json of users for debugging
+app.get("/users.json", (req, res) => {
+  res.json(users);
+})
+
 // List of URLs
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"] };
+  const templateVars = { urls: urlDatabase, username: req.cookies["username"], password: req.cookies["password"], user_id: req.cookies["user_id"]};
   res.render("urls_index", templateVars);
 });
 
 // Page to create new URL
 app.get("/urls/new", (req, res) => {
-  const templateVars = {username: req.cookies["username"]};
+  const templateVars = { urls: urlDatabase, username: req.cookies["username"], password: req.cookies["password"], user_id: req.cookies["user_id"]};
   res.render("urls_new", templateVars);
 });
 
 // Display new shortURL
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"] };
+  const templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"], password: req.cookies["password"], user_id: req.cookies["user_id"] };
   res.render("urls_show", templateVars);
 });
 
 app.get("/urls/:shortURL/edit", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"] }
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"], password: req.cookies["password"], user_id: req.cookies["user_id"] }
   res.render("urls_show", templateVars);
 });
 
 // Display login form
 app.get("/login", (req, res) => {
-  const templateVars = {username: req.cookies["username"]};
+  const templateVars = {username: req.cookies["username"], password: req.cookies["password"], user_id: req.cookies["user_id"]};
   res.render("login", templateVars);
 });
 
 // Logout - Clear cookie, redir to login
 app.get("/logout", (req, res) => {
   res.clearCookie('username');
+  res.clearCookie('password');
+  res.clearCookie('user_id');
   res.redirect("/login");
 });
 
 // Sign Up page
 app.get("/register", (req, res) => {
-  const templateVars = {username: req.cookies["username"]};
+  const templateVars = {username: req.cookies["username"], password: req.cookies["password"], user_id: req.cookies["user_id"]};
   res.render("register", templateVars);
 });
+
 
 
 // ROUTES - POST
@@ -95,10 +103,18 @@ app.post("/login", (req, res) => {
 app.post("/register", (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
-  res.cookie('username', username);
   res.cookie('password', password);
-  const templateVars = {username: req.cookies["username"], password: req.cookies["password"]};
-  res.redirect('/urls');
+  createNewUser(username, password);
+  let userKeys = Object.keys(users);
+  let newUserPosition = userKeys.length - 1;
+  let user_id = userKeys[newUserPosition];
+  console.log(user_id);
+  res.cookie('user_id', user_id)
+  const templateVars = {
+    username: req.cookies["username"],
+    password: req.cookies["password"],
+    user_id: req.cookies["user_id"]};
+    res.redirect('/urls');
 });
 
 // UTILS
@@ -106,5 +122,3 @@ app.post("/register", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
-
-module.exports = urlDatabase;
