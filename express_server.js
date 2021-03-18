@@ -145,14 +145,13 @@ app.post("/login", (req, res) => {
   let userPassword = req.body.password;
   let userObj;
   let user_id = findUserByEmail(userEmail);
-  console.log("The user ID: ", user_id.id);
-  res.cookie('user_id', user_id.id);
-  if (userPassword === user_id.password) {
-    // If true, login. To do that, the userObj needs to be true.
+  if (userPassword === user_id.password && userEmail === user_id.email) {
+    res.cookie('user_id', user_id.id);
     userObj = user_id;
     console.log(userObj);
-    //res.cookie('userObj', userObj);
-    //? The userObj is being sent as a cookie. Not sure from where. Also, the userObj is truthy, but the _header.ejs isn't picking up on it. Why?
+  } else {
+    res.status(403);
+    res.send("403: Incorrect email or password.");
   }
   res.redirect('/urls');
 });
