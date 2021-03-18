@@ -150,23 +150,10 @@ app.post("/login", (req, res) => {
   };
   //res.redirect('/urls', templateVars);
   res.redirect('/urls');
-  });
+});
   
-  //const username = req.body.username;
-  //const user_id = req.cookies["user_id"];
-  /* const templateVars = {
-    username: req.cookies["username"],
-    password: req.cookies["password"],
-    user_id: req.cookies["user_id"],
-    userObj: userObj}; */
-/*   // This small block, and the template vars in the res.redirect are what is causing an error in the program. I believe this will be addressed in the next lesson, so I am leaving it as is for now. Otherwise delete these few lines and the program should work normally again.
-  const user_id = req.body.user_id;
-  const userObj = findUserByCookie(user_id);
-  const templateVars = {userObj: userObj}; */
-  //res.cookie('username', username);
 
-// UTILS
-// Server listening
+// UTIL - Server listening
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });
