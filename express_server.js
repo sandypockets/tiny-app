@@ -1,14 +1,15 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
 const app = express();
 const PORT = 8080;
-const bodyParser = require('body-parser');
-const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser, findUserByCookie, validateCreds} = require('./helpers')
+const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser, findUserByCookie, validateCreds, findUserByEmail} = require('./helpers')
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 app.set("view engine", "ejs");
-
+app.use(morgan('short'));
 
 // ROUTES - GET
 // .json of URLs for debugging
@@ -32,10 +33,6 @@ app.get("/urls", (req, res) => {
     res.status(400);
     res.redirect('/register');
   }; */
-
-  console.log("USERID!!", user_id);
-  console.log("USERS!!", users[user_id]);
-  console.log("TEMPLATEVARS!!", templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -106,6 +103,7 @@ app.post("/urls/:id", (req, res) => {
   res.redirect('/urls');
 });
 
+// Edit shortURL
 app.post("/urls/:shortURL/edit", (req, res) => {
   //const user_id = req.body.user_id;
   const shortURL = req.params.shortURL;
@@ -137,40 +135,19 @@ app.post("/register", (req, res) => {
     user_id: req.cookies["user_id"],
     userObj: userObj};
   console.log(userObj);
-
- /*  if (!validateCreds(userObj)) {
-    //res.cookie('Status', 400);
-    res.status(400);
-    res.redirect('/register');
-  }; */
-    //res.clearCookie('Status', 400);
-    res.redirect('/urls');
+  res.redirect('/urls');
 });
 
 // Login and set cookie
 app.post("/login", (req, res) => {
   let userEmail = req.body.username;
-  console.log("useremail: ", userEmail);
-  let counter = 0;
-  let user_id;
-  let templateVars;
-
-  // Email is being submitted properly. Just need to sort out the issue with this loop, and assigning the cookie.
-
-  for (let user in users) {
-    if (userEmail === user.email) {
-      user_id = user.id;
-      //res.cookies('user_id', user_id)
-      counter++;
-    }
-  } if (counter > 0) {
-    const userObj = findUserByCookie(user_id);
-    templateVars = {
-      user_id: user_id,
-      userObj: userObj
-    };
-  };
+  // Now that the email is there, find the user with it
+  let user_id = findUserByEmail(userEmail);
+  //res.cookies('user_id', user_id)
   res.cookie('user_id', user_id);
+  const templateVars = {
+    user_id: res.cookie["user_id"]
+  };
   //res.redirect('/urls', templateVars);
   res.redirect('/urls');
   });

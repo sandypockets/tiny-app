@@ -46,6 +46,19 @@ const findUserByCookie = (user_id) => {
   return user;
 };
 
+// Find user by their email address
+const findUserByEmail = (email) => {
+  for (let userid in users) {
+    if (users[userid].email === email) {
+      return users[userid];
+    }
+  }
+  // Does this need a false return?
+};
+
+
+
+
 // Return StatusCode 400 if email or password is blank
 // Implemented within the register POST in express_server.js
 // This func is not needed atm, but the program breaks when it is removed.
@@ -75,4 +88,4 @@ const editURL = (shortURL, longURL) => {
   return shortURL;
 };
 
-module.exports = {urlDatabase, generateRandomString, addNewURL, editURL, users, createNewUser, findUserByCookie, validateCreds};
+module.exports = {urlDatabase, generateRandomString, addNewURL, editURL, users, createNewUser, findUserByCookie, validateCreds, findUserByEmail};
