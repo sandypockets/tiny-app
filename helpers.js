@@ -24,6 +24,7 @@ function generateRandomString() {
   return randomString;
 };
 
+// Adds a user to the users database
 const addUserToDB = (userID, email, password) => {
   return users[userID] = {
     id: userID, 
@@ -32,9 +33,17 @@ const addUserToDB = (userID, email, password) => {
   };
 };
 
+// Creates a new userID and creates a new user in the users database
 const createNewUser = (email, password) => {
   const newUserID = generateRandomString();
   return addUserToDB(newUserID, email, password);
+};
+
+// Find a user by their user_ID cookie value
+const findUserByCookie = (user_id) => {
+  //const user_ID = req.body.user_ID;
+  const user = users[user_id];
+  return user;
 };
   
 const addNewURL = (longURL) => {
@@ -50,4 +59,4 @@ const editURL = (shortURL, longURL) => {
   return shortURL;
 };
 
-module.exports = {urlDatabase, generateRandomString, addNewURL, editURL, users, createNewUser};
+module.exports = {urlDatabase, generateRandomString, addNewURL, editURL, users, createNewUser, findUserByCookie};

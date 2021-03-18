@@ -3,7 +3,7 @@ const cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080;
 const bodyParser = require('body-parser');
-const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser} = require('./helpers')
+const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser, findUserByCookie} = require('./helpers')
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
@@ -23,30 +23,40 @@ app.get("/users.json", (req, res) => {
 
 // List of URLs
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"], password: req.cookies["password"], user_id: req.cookies["user_id"]};
+  const user_id = req.body.user_id;
+  const userObj = findUserByCookie(user_id);
+  const templateVars = { urls: urlDatabase, userObj: userObj};
   res.render("urls_index", templateVars);
 });
 
 // Page to create new URL
 app.get("/urls/new", (req, res) => {
-  const templateVars = { urls: urlDatabase, username: req.cookies["username"], password: req.cookies["password"], user_id: req.cookies["user_id"]};
+  const user_id = req.body.user_id;
+  const userObj = findUserByCookie(user_id);
+  const templateVars = { urls: urlDatabase, userObj: userObj};
   res.render("urls_new", templateVars);
 });
 
 // Display new shortURL
 app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"], password: req.cookies["password"], user_id: req.cookies["user_id"] };
+  const user_id = req.body.user_id;
+  const userObj = findUserByCookie(user_id);
+  const templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], userObj: userObj};
   res.render("urls_show", templateVars);
 });
 
 app.get("/urls/:shortURL/edit", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies["username"], password: req.cookies["password"], user_id: req.cookies["user_id"] }
+  const user_id = req.body.user_id;
+  const userObj = findUserByCookie(user_id);
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], userObj: userObj}
   res.render("urls_show", templateVars);
 });
 
 // Display login form
 app.get("/login", (req, res) => {
-  const templateVars = {username: req.cookies["username"], password: req.cookies["password"], user_id: req.cookies["user_id"]};
+  const user_id = req.body.user_id;
+  const userObj = findUserByCookie(user_id);
+  const templateVars = {userObj: userObj};
   res.render("login", templateVars);
 });
 
@@ -60,11 +70,11 @@ app.get("/logout", (req, res) => {
 
 // Sign Up page
 app.get("/register", (req, res) => {
-  const templateVars = {username: req.cookies["username"], password: req.cookies["password"], user_id: req.cookies["user_id"]};
+  const user_id = req.body.user_id;
+  const userObj = findUserByCookie(user_id);
+  const templateVars = {userObj: userObj};
   res.render("register", templateVars);
 });
-
-
 
 // ROUTES - POST
 // Create new shortURL
@@ -87,6 +97,7 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:shortURL/edit", (req, res) => {
+  const user_id = req.body.user_id;
   const shortURL = req.params.shortURL;
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect(`/urls/${shortURL}/edit`);
@@ -110,10 +121,13 @@ app.post("/register", (req, res) => {
   let user_id = userKeys[newUserPosition];
   console.log(user_id);
   res.cookie('user_id', user_id)
+  const userObj = findUserByCookie(user_id);
   const templateVars = {
     username: req.cookies["username"],
     password: req.cookies["password"],
-    user_id: req.cookies["user_id"]};
+    user_id: req.cookies["user_id"],
+    userObj: userObj};
+  console.log(userObj);
     res.redirect('/urls');
 });
 

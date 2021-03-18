@@ -9,13 +9,13 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
         <!-- Adding username from cookies to header -->
-        <% if (username){ %>
-          <a class="nav-item nav-link"> <%= username %> </a>
+        <% /* if (username){ */ %>
+          <a class="nav-item nav-link"> <%= /* username */ %> </a>
           <a class="nav-item nav-link" href="/logout">Logout</a>
-          <% } else { %>
+          <% /* } else { */ %>
             <a class="nav-item nav-link" href="/login">Login</a>
             <a class="nav-item nav-link" href="/register">Register</a>
-            <% }; %> 
+            <% /* }; */ %> 
       </div>
     </div>
   </nav>
