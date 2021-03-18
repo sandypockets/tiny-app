@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const app = express();
 const PORT = 8080;
-const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser, findUserByCookie, validateCreds, findUserByEmail} = require('./helpers')
+const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser, findUserByCookie, validateCreds, findUserByEmail, addNewUrlToUser} = require('./helpers')
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
@@ -29,6 +29,7 @@ app.get("/urls", (req, res) => {
     const user_id = req.cookies["user_id"];
     const userObj = findUserByCookie(user_id);
     const templateVars = { urls: urlDatabase, userObj: userObj};
+
     res.render("urls_index", templateVars);
     return;
   } else {
@@ -48,7 +49,10 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const user_id = req.body.user_id;
   const userObj = findUserByCookie(user_id);
-  const templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], userObj: userObj};
+  //? shortURL is undefined at this time. Need to figure out how to pull it and add to template vars so that the script there can work.
+  // urlDatabase[req.params.shortURL]
+  const templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, userObj: userObj};
+  console.log("The short URL is: ", shortURL);
   res.render("urls_show", templateVars);
 });
 
@@ -56,7 +60,7 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/urls/:shortURL/edit", (req, res) => {
   const user_id = req.body.user_id;
   const userObj = findUserByCookie(user_id);
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], userObj: userObj}
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, userObj: userObj}
   res.render("urls_show", templateVars);
 });
 
@@ -91,8 +95,14 @@ app.get("/register", (req, res) => {
 
 /// ROUTES - POST ///
 // Create new shortURL
-app.post("/urls", (req, res) => {
+/* app.post("/urls", (req, res) => {
   const id = addNewURL(req.body.longURL);
+  res.redirect(`/urls/${id}`);
+}); */
+// ^
+// Create new shortURL - unique to each user
+app.post("/urls", (req, res) => {
+  const id = addNewUrlToUser(req.body.longURL, req.body.user_id.id);
   res.redirect(`/urls/${id}`);
 });
 
