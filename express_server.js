@@ -113,13 +113,6 @@ app.post("/urls/:shortURL/edit", (req, res) => {
   res.redirect(`/urls/${shortURL}/edit`);
 });
 
-// Login and set cookie
-app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie('username', username);
-  res.redirect('/urls');
-});
-
 // Register / Sign up
 app.post("/register", (req, res) => {
   const username = req.body.username;
@@ -153,6 +146,19 @@ app.post("/register", (req, res) => {
 
     //res.clearCookie('Status', 400);
     res.redirect('/urls');
+});
+
+// Login and set cookie
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+
+  // This small block, and the template vars in the res.redirect are what is causing an error in the program. I believe this will be addressed in the next lesson, so I am leaving it as is for now. Otherwise delete these few lines and the program should work normally again.
+  const user_id = req.body.user_id;
+  const userObj = findUserByCookie(user_id);
+  const templateVars = {userObj: userObj};
+
+  res.cookie('username', username);
+  res.redirect('/urls', templateVars);
 });
 
 // UTILS
