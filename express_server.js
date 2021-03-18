@@ -138,9 +138,12 @@ app.post("/register", (req, res) => {
   res.redirect('/urls');
 });
 
+
 // Login and set cookie
 app.post("/login", (req, res) => {
   let userEmail = req.body.username;
+  let userPassword = req.body.password;
+  let userObj;
   // Now that the email is there, find the user with it
   let user_id = findUserByEmail(userEmail);
   //res.cookies('user_id', user_id)
@@ -148,7 +151,18 @@ app.post("/login", (req, res) => {
   const templateVars = {
     user_id: res.cookie["user_id"]
   };
-  //res.redirect('/urls', templateVars);
+  // Next need to check if the password is correct.
+  if (userPassword === user_id.password) {
+    console.log('Password is correct');
+    // If it is, login the user. To do that, the userObj needs to be true.
+    userObj = user_id;
+    console.log(userObj);
+    res.cookie('userObj', userObj);
+  }
+
+  // Note that the userObj is being sent as a cookie. Why?? Sort this out after authentication. 
+
+
   res.redirect('/urls');
 });
   
