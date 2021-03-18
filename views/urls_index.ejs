@@ -21,10 +21,14 @@
         </tr>
       </thead>
       <tbody>
+        <!-- Display URLS -->
         <% for(let url in urls) { %>
           <tr>
+            <!-- Adding IF logic -->
+            <% if (urls[url].userID === userObj.id) { %>
+            
             <td><%= url %></td>
-            <td><%= urls[url] %></td>
+            <td><%= urls[url].longURL %></td>
             <td>
               <form method="GET" action="/urls/<%= url %>/edit">
                 <input class="btn btn-outline-primary" type="submit" value="edit">
@@ -34,6 +38,7 @@
               <form method="POST" action="/urls/<%= url %>/delete">
                 <input class="btn btn-outline-primary" type="submit" value="delete">
               </form>
+              <% } %> 
           </td>
           </tr>
         <% } %>

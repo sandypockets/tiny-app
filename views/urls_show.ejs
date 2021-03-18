@@ -11,6 +11,10 @@
   <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
+        <!-- Fixing longURL for new db. Testing to ensure shortURL var is coming through -->
+        <!-- OG is longURL -->
+        <!-- Will use: urlDatabase[shortURL].longURL  -->
+        <!-- Or perhaps: urlDatabase[shortURL] -->
         <h5 class="card-title">TinyURL for: <%= longURL %></h5>
         <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
        
