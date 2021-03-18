@@ -1,3 +1,8 @@
+const bcrypt = require('bcryptjs');
+
+//const bcrypt = require('bcrypt');
+//const saltRounds = 10;
+
 // Database of existing URLs V1
 /* const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -48,8 +53,12 @@ const addUserToDB = (userID, email, password) => {
 
 // Creates a new userID and creates a new user in the users database
 const createNewUser = (email, password) => {
+  // Adding hashing to passwords
+  let hashedPassword = hashPassword(password);
+
   const newUserID = generateRandomString();
-  return addUserToDB(newUserID, email, password);
+  // Changed 'hashedPasswords' from 'password'
+  return addUserToDB(newUserID, email, hashedPassword);
 };
 
 // Find a user by their user_ID cookie value
@@ -67,6 +76,12 @@ const findUserByEmail = (email) => {
     }
   }
   // Does this need a false return?
+};
+
+const hashPassword = (plaintext) => {
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(plaintext, salt);
+  return hash;
 };
 
 

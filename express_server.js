@@ -2,6 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+//const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080;
 const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser, findUserByCookie, validateCreds, findUserByEmail, addNewUrlToUser} = require('./helpers')
