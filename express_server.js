@@ -39,6 +39,7 @@ app.get("/users.json", (req, res) => {
 // List of URLs
 app.get("/urls", (req, res) => {
   const user_id = req.session['user_id'];
+  console.log("41:", user_id);
   if (user_id) {
     const userObj = findUserById(user_id.id);
     const templateVars = { urls: urlDatabase, userObj: userObj};
