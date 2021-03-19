@@ -1,17 +1,29 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
+//const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const bcrypt = require('bcryptjs');
-//const bcrypt = require('bcryptjs');
+const cookieSession = require('cookie-session');
+
+/* 
+WRITE VALUE = req.session.user_id = "some value";
+READ VALUE  = req.session.user_id
+*/
+
 const app = express();
 const PORT = 8080;
 const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser, findUserByCookie, validateCreds, findUserByEmail, addNewUrlToUser, hashPassword, compareHashes} = require('./helpers')
 
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
+// app.use(cookieParser());
 app.set("view engine", "ejs");
 app.use(morgan('short'));
+app.use(cookieSession({
+  name: 'session',
+  keys: ['key1', 'key2'],
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 
 /// ROUTES - GET ///
 // .json of URLs for debugging
@@ -24,11 +36,14 @@ app.get("/users.json", (req, res) => {
   res.json(users);
 })
 
+
 // List of URLs
 app.get("/urls", (req, res) => {
-  const user_id = req.cookies.user_id;
+  //user_id = req.session['user_id'] = user_id;
+  const user_id = req.session['user_id'];
   if (user_id) {
-    const user_id = req.cookies["user_id"];
+    const user_id = req.session['user_id'];
+    // const user_id = req.cookies["user_id"]; --Original
     const userObj = findUserByCookie(user_id);
     const templateVars = { urls: urlDatabase, userObj: userObj};
 
@@ -42,6 +57,7 @@ app.get("/urls", (req, res) => {
 // Page to create new URL
 app.get("/urls/new", (req, res) => {
   const user_id = req.body.user_id;
+  console.log("61", user_id);
   const userObj = findUserByCookie(user_id);
   const templateVars = { urls: urlDatabase, userObj: userObj};
   res.render("urls_new", templateVars);
@@ -93,9 +109,10 @@ app.get("/login", (req, res) => {
 
 // Logout - Clear cookie, redir to login
 app.get("/logout", (req, res) => {
-  res.clearCookie('username');
-  res.clearCookie('password');
-  res.clearCookie('user_id');
+  req.session['user_id'] = null;
+  // res.clearCookie('username');
+  // res.clearCookie('password');
+  // res.clearCookie('user_id');
   res.redirect("/login");
 });
 
@@ -152,19 +169,22 @@ app.post("/register", (req, res) => {
     res.status(400);
     res.send("Status: 400 - Invalid entry. Please enter a valid username or password.");
   };
-  res.cookie('password', password);
+  //res.session.password = "password" // Is this even needed? Why is the pw a cookie?
+  //res.cookie('password', password);
   createNewUser(username, password);
   let userKeys = Object.keys(users);
   let newUserPosition = userKeys.length - 1;
   let user_id = userKeys[newUserPosition];
   console.log(user_id);
-  res.cookie('user_id', user_id);
+  req.session['user_id'] = user_id;
+  //res.cookie('user_id', user_id);
   const userObj = findUserByCookie(user_id);
   const templateVars = {
-    username: req.cookies["username"],
-    password: req.cookies["password"],
-    user_id: req.cookies["user_id"],
-    userObj: userObj};
+    username: req.session["username"],
+    password: req.session["password"],
+    user_id: req.session["user_id"],
+    userObj: userObj
+    };
   console.log(userObj);
   res.redirect('/urls');
 });
@@ -186,7 +206,10 @@ app.post("/login", (req, res) => {
   if (userEmail === user_id.email) {
     if (compareHashes(userPassword)) {
       //if (userPassword === user_id.password && userEmail === user_id.email) {
-        res.cookie('user_id', user_id.id);
+        
+        req.session['user_id'] = user_id;
+        //res.session.user_id = `${user_id.id}`
+        //res.cookie('user_id', user_id.id);
         userObj = user_id;
         console.log(userObj);
       } else {
