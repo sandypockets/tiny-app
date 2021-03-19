@@ -2,10 +2,11 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const bcrypt = require('bcryptjs');
 //const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080;
-const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser, findUserByCookie, validateCreds, findUserByEmail, addNewUrlToUser} = require('./helpers')
+const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser, findUserByCookie, validateCreds, findUserByEmail, addNewUrlToUser, hashPassword, compareHashes} = require('./helpers')
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
@@ -173,17 +174,27 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   let userEmail = req.body.username;
   let userPassword = req.body.password;
+
+  // userPassword = hashPassword(userPassword);
+  // Load hash from your password DB.
+
+  // bcrypt.compareSync("not_bacon", hash); // false
+  
   let userObj;
   let user_id = findUserByEmail(userEmail);
-  if (userPassword === user_id.password && userEmail === user_id.email) {
-    res.cookie('user_id', user_id.id);
-    userObj = user_id;
-    console.log(userObj);
-  } else {
-    res.status(403);
-    res.send("403: Incorrect email or password.");
-  }
-  res.redirect('/urls');
+  
+  if (userEmail === user_id.email) {
+    if (compareHashes(userPassword)) {
+      //if (userPassword === user_id.password && userEmail === user_id.email) {
+        res.cookie('user_id', user_id.id);
+        userObj = user_id;
+        console.log(userObj);
+      } else {
+        res.status(403);
+        res.send("403: Incorrect email or password.");
+      }
+    }
+    res.redirect('/urls');
 });
   
 

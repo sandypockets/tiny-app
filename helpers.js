@@ -84,6 +84,15 @@ const hashPassword = (plaintext) => {
   return hash;
 };
 
+const compareHashes = (plaintext) => {
+  const salt = bcrypt.genSaltSync(10);
+  const hash = bcrypt.hashSync(plaintext, salt);
+  if (bcrypt.compareSync(plaintext, hash)) {
+    return true;
+  }
+  return false;
+};
+
 
 
 
@@ -124,4 +133,4 @@ const editURL = (shortURL, longURL) => {
   return shortURL;
 };
 
-module.exports = {urlDatabase, generateRandomString, addNewURL, editURL, users, createNewUser, findUserByCookie, validateCreds, findUserByEmail, addNewUrlToUser};
+module.exports = {urlDatabase, generateRandomString, addNewURL, editURL, users, createNewUser, findUserByCookie, validateCreds, findUserByEmail, addNewUrlToUser, hashPassword, compareHashes};
