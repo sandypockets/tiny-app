@@ -30,6 +30,12 @@ app.get("/users.json", (req, res) => {
   res.json(users);
 })
 
+
+// BUGS
+// The List of URLs is not showing new URLs created by the user. It shows the previously created hardcoded URL
+// but does not show the new URLs created. 
+// Suspect it is something in the urls_index.ejs file, but unsure.
+
 // List of URLs
 app.get("/urls", (req, res) => {
   const user_id = req.session['user_id'];
