@@ -56,10 +56,12 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const user_id = req.body.user_id;
   const userObj = findUserById(user_id);
-  //? shortURL is undefined at this time. Need to figure out how to pull it and add to template vars so that the script there can work.
-  // urlDatabase[req.params.shortURL]
-  //const templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, userObj: userObj};
-  const templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], userObj: userObj};
+  console.log("Line 62", req.params);
+  console.log("Line 63", req.params.shortURL);
+  console.log("Line 64", req.params.shortURL.shortURL);
+  console.log("Line 65", req.params.longURL)
+  //const templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], userObj: userObj};
+  const templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, userObj: userObj};
   res.render("urls_show", templateVars);
 });
 
@@ -115,8 +117,14 @@ app.get("/register", (req, res) => {
 // Create new shortURL - unique to each user
 app.post("/urls", (req, res) => {
   //const id = addNewUrlToUser(req.body.longURL, req.body.user_id.id);
-  const id = addNewUrlToUser(req.body.longURL, req.body.user_id);
-  res.redirect(`/urls/${id}`);
+  const id = addNewUrlToUser(req.body.longURL, req.session['user_id'].id);
+  console.log("ID TEST", id);
+  console.log("Line 122:", req.body.longURL);
+  console.log("Line 123", req.body.user_id);
+  //console.log("Line 124", req.session);
+  console.log("Line 125:", req.session['user_id']);
+  console.log("Line 126:", req.session['user_id'].id);
+  res.redirect(`/urls/${id.shortURL}`);
 });
 
 // Delete existing shortURL

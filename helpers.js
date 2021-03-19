@@ -115,7 +115,7 @@ const validateCreds = (userObj) => {
 // Add new URL to user - testing in REPL
 const addNewUrlToUser = (longURL, user_id) => {
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = {longURL, user_id};
+  urlDatabase[shortURL] = {longURL, user_id, shortURL};
   // This return statement might need work
   return urlDatabase[shortURL];
 };
