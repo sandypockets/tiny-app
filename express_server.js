@@ -1,5 +1,4 @@
 const express = require('express');
-//const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const bcrypt = require('bcryptjs');
@@ -10,7 +9,6 @@ const PORT = 8080;
 const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser, findUserByCookie: findUserById, validateCreds, findUserByEmail, addNewUrlToUser, hashPassword, compareHashes} = require('./helpers')
 
 app.use(bodyParser.urlencoded({extended: true}));
-// app.use(cookieParser());
 app.set("view engine", "ejs");
 app.use(morgan('short'));
 app.use(cookieSession({
@@ -18,6 +16,7 @@ app.use(cookieSession({
   keys: ['key1', 'key2'],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
+
 
 /// ROUTES - GET ///
 // .json of URLs for debugging
@@ -30,16 +29,9 @@ app.get("/users.json", (req, res) => {
   res.json(users);
 })
 
-
-// BUGS
-// The List of URLs is not showing new URLs created by the user. It shows the previously created hardcoded URL
-// but does not show the new URLs created. 
-// Suspect it is something in the urls_index.ejs file, but unsure.
-
 // List of URLs
 app.get("/urls", (req, res) => {
   const user_id = req.session['user_id'];
-  console.log("41:", user_id);
   if (user_id) {
     const userObj = findUserById(user_id.id);
     const templateVars = { urls: urlDatabase, userObj: userObj};
@@ -63,11 +55,6 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const user_id = req.body.user_id;
   const userObj = findUserById(user_id);
-  console.log("Line 62", req.params);
-  console.log("Line 63", req.params.shortURL);
-  console.log("Line 64", req.params.shortURL.shortURL);
-  console.log("Line 65", req.params.longURL)
-  //const templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], userObj: userObj};
   const templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, userObj: userObj};
   res.render("urls_show", templateVars);
 });
@@ -123,14 +110,7 @@ app.get("/register", (req, res) => {
 /// ROUTES - POST ///
 // Create new shortURL - unique to each user
 app.post("/urls", (req, res) => {
-  //const id = addNewUrlToUser(req.body.longURL, req.body.user_id.id);
   const id = addNewUrlToUser(req.body.longURL, req.session['user_id'].id);
-  console.log("ID TEST", id);
-  console.log("Line 122:", req.body.longURL);
-  console.log("Line 123", req.body.user_id);
-  //console.log("Line 124", req.session);
-  console.log("Line 125:", req.session['user_id']);
-  console.log("Line 126:", req.session['user_id'].id);
   res.redirect(`/urls/${id.shortURL}`);
 });
 
@@ -170,13 +150,6 @@ app.post("/register", (req, res) => {
   let newUserPosition = userKeys.length - 1;
   let user_id = userKeys[newUserPosition];
   req.session['user_id'] = user_id;
-  const userObj = findUserById(user_id);
-/*   const templateVars = {
-    username: req.session["username"],
-    password: req.session["password"],
-    user_id: req.session["user_id"],
-    userObj: userObj
-    };*/
   res.redirect('/urls');
 });
 
@@ -190,8 +163,6 @@ app.post("/login", (req, res) => {
   if (userEmail === user_id.email) {
     if (compareHashes(userPassword)) {
         req.session['user_id'] = user_id;
-        //res.session.user_id = `${user_id.id}`
-        //res.cookie('user_id', user_id.id);
         userObj = user_id;
       } else {
         res.status(403);
