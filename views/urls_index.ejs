@@ -25,6 +25,7 @@
         <% for(let url in urls) { %>
           <tr>
             <!-- Adding IF logic -->
+            <% /* if (urls[url].userID === userObj.id) { */ %>
             <% if (urls[url].userID === userObj.id) { %>
             
             <td><%= url %></td>

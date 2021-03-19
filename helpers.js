@@ -62,7 +62,7 @@ const createNewUser = (email, password) => {
 };
 
 // Find a user by their user_ID cookie value
-const findUserByCookie = (user_id) => {
+const findUserById = (user_id) => {
   //const user_ID = req.body.user_ID;
   const user = users[user_id];
   return user;
@@ -133,4 +133,4 @@ const editURL = (shortURL, longURL) => {
   return shortURL;
 };
 
-module.exports = {urlDatabase, generateRandomString, addNewURL, editURL, users, createNewUser, findUserByCookie, validateCreds, findUserByEmail, addNewUrlToUser, hashPassword, compareHashes};
+module.exports = {urlDatabase, generateRandomString, addNewURL, editURL, users, createNewUser, findUserByCookie: findUserById, validateCreds, findUserByEmail, addNewUrlToUser, hashPassword, compareHashes};
