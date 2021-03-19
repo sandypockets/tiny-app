@@ -33,10 +33,8 @@ app.get("/users.json", (req, res) => {
 // List of URLs
 app.get("/urls", (req, res) => {
   const user_id = req.session['user_id'];
-  console.log("Line 54", user_id);
   if (user_id) {
     const userObj = findUserById(user_id.id);
-    console.log("Line 59", userObj)
     const templateVars = { urls: urlDatabase, userObj: userObj};
     res.render("urls_index", templateVars);
     return;
@@ -49,10 +47,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const user_id = req.session['user_id'];
   //const user_id = req.body.user_id;
-  console.log("61", user_id);
   const userObj = findUserById(user_id.id);
-  console.log("Line 62!", userObj);
-  console.log("Line 63!", userObj.id);
   const templateVars = { urls: urlDatabase, userObj: userObj};
   res.render("urls_new", templateVars);
 });
@@ -65,7 +60,6 @@ app.get("/urls/:shortURL", (req, res) => {
   // urlDatabase[req.params.shortURL]
   //const templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, userObj: userObj};
   const templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], userObj: userObj};
-  //console.log("The short URL is: ", shortURL);
   res.render("urls_show", templateVars);
 });
 
@@ -93,11 +87,8 @@ app.get("/u/:shortURL", (req, res) => {
 
 // Display login form
 app.get("/login", (req, res) => {
-  console.log("reqBody is: ", req.body);
   const user_id = req.body.user_id;
-  console.log("The User ID: ", user_id);
   const userObj = findUserById(user_id);
-  console.log("The userObj from /login is: ", userObj);
   const templateVars = {userObj: userObj};
   res.render("login", templateVars);
 });
@@ -163,7 +154,6 @@ app.post("/register", (req, res) => {
   let userKeys = Object.keys(users);
   let newUserPosition = userKeys.length - 1;
   let user_id = userKeys[newUserPosition];
-  console.log(user_id);
   req.session['user_id'] = user_id;
   const userObj = findUserById(user_id);
 /*   const templateVars = {
@@ -171,8 +161,7 @@ app.post("/register", (req, res) => {
     password: req.session["password"],
     user_id: req.session["user_id"],
     userObj: userObj
-    };
-  console.log(userObj); */
+    };*/
   res.redirect('/urls');
 });
 
@@ -189,7 +178,6 @@ app.post("/login", (req, res) => {
         //res.session.user_id = `${user_id.id}`
         //res.cookie('user_id', user_id.id);
         userObj = user_id;
-        console.log(userObj);
       } else {
         res.status(403);
         res.send("403: Incorrect email or password.");
