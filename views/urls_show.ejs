@@ -7,20 +7,15 @@
 </head>
 
 <body>
+  <!-- Header Partial -->
   <%- include('partials/_header') %>
   <div class="card text-center">
       <div class="card-header"></div>
       <div class="card-body">
-        <!-- Fixing longURL for new db. Testing to ensure shortURL var is coming through -->
-        <!-- OG is longURL -->
-        <!-- Will use: urlDatabase[shortURL].longURL  -->
-        <!-- Or perhaps: urlDatabase[shortURL] -->
         <h5 class="card-title">TinyURL for: <%= longURL %></h5>
         <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
-       
         <!-- View existing URLS -->
         <p class="card-text"><a href='/urls'>View URLs</a></p>
-
         <!-- Edit Form Testing! Needs work still -->
           <form class="form-inline" action="/urls/<%= shortURL %>/edit" method="POST">
             <div class="form-group mb-2">

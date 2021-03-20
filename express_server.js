@@ -63,12 +63,6 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/urls/:shortURL/edit", (req, res) => {
   const user_id = req.body.user_id;
   const userObj = findUserById(user_id);
-  console.log("66", req.body);
-  console.log("67", req.body.user_id);
-  console.log("68", req.body.shortURL);
-  console.log("69", req.body.longURL);
-  console.log("70", req.params);
-
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, userObj: userObj}
   res.render("urls_show", templateVars);
 });
@@ -132,22 +126,12 @@ app.post("/urls/:id", (req, res) => {
 // EDIT SHORTURL
 app.post("/urls/:shortURL/edit", (req, res) => {
   const user_id = req.session.user_id.id;
-  console.log("136", user_id);
   const shortURL = req.params.shortURL;
   urlDatabase[shortURL] = {
     shortURL: shortURL,
     longURL: req.body.longURL,
     userID: user_id
   };
-  console.log("137", shortURL);
-  console.log("138", req.params.shortURL);
-  console.log("139", req.params.longURL);
-  console.log("140", req.params);
-  console.log("141", req.body);
-  console.log("146", req.body.user_id);
-  console.log("146", req.body.user_id);
-  console.log("146", req.body.user_id);
-  console.log("149", req.session);
   res.redirect(`/urls/${shortURL}/edit`);
 });
 
@@ -161,11 +145,13 @@ app.post("/register", (req, res) => {
     res.status(400);
     res.send("Status: 400 - Invalid entry. Please enter a valid username or password.");
   };
-  createNewUser(username, password);
+  let userObj = createNewUser(username, password);
   let userKeys = Object.keys(users);
+  console.log("166", userKeys)
   let newUserPosition = userKeys.length - 1;
   let user_id = userKeys[newUserPosition];
   req.session['user_id'] = user_id;
+  console.log("160", req.session.user_id);
   res.redirect('/urls');
 });
 

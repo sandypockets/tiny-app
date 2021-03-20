@@ -24,10 +24,8 @@
         <!-- Display URLS -->
         <% for(let url in urls) { %>
           <tr>
-            <!-- Adding IF logic -->
-            <% /* if (urls[url].userID === userObj.id) { */ %>
+            <!-- Display URLs only if logged in and created by that user -->
             <% if (urls[url].userID === userObj.id) { %>
-            
             <td><%= url %></td>
             <td><%= urls[url].longURL %></td>
             <td>
