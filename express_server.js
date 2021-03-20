@@ -63,6 +63,12 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/urls/:shortURL/edit", (req, res) => {
   const user_id = req.body.user_id;
   const userObj = findUserById(user_id);
+  console.log("66", req.body);
+  console.log("67", req.body.user_id);
+  console.log("68", req.body.shortURL);
+  console.log("69", req.body.longURL);
+  console.log("70", req.params);
+
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, userObj: userObj}
   res.render("urls_show", templateVars);
 });
@@ -91,10 +97,7 @@ app.get("/login", (req, res) => {
 
 // Logout - Clear cookie, redir to login
 app.get("/logout", (req, res) => {
-  req.session['user_id'] = null;
-  // res.clearCookie('username');
-  // res.clearCookie('password');
-  // res.clearCookie('user_id');
+  req.session = null;
   res.redirect("/login");
 });
 
@@ -105,7 +108,6 @@ app.get("/register", (req, res) => {
   const templateVars = {userObj: userObj};
   res.render("register", templateVars);
 });
-
 
 /// ROUTES - POST ///
 // Create new shortURL - unique to each user
@@ -129,9 +131,23 @@ app.post("/urls/:id", (req, res) => {
 
 // EDIT SHORTURL
 app.post("/urls/:shortURL/edit", (req, res) => {
-  //const user_id = req.body.user_id;
+  const user_id = req.session.user_id.id;
+  console.log("136", user_id);
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = {
+    shortURL: shortURL,
+    longURL: req.body.longURL,
+    userID: user_id
+  };
+  console.log("137", shortURL);
+  console.log("138", req.params.shortURL);
+  console.log("139", req.params.longURL);
+  console.log("140", req.params);
+  console.log("141", req.body);
+  console.log("146", req.body.user_id);
+  console.log("146", req.body.user_id);
+  console.log("146", req.body.user_id);
+  console.log("149", req.session);
   res.redirect(`/urls/${shortURL}/edit`);
 });
 
