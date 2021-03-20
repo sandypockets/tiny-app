@@ -1,15 +1,6 @@
 const bcrypt = require('bcryptjs');
 
-//const bcrypt = require('bcrypt');
-//const saltRounds = 10;
-
-// Database of existing URLs V1
-/* const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
- */
-// Database of existing URLs, and their users - V2
+// Database of existing URLs, and the users that created them
 const urlDatabase = {
   b2xVn2: { longURL: "http://www.lighthouselabs.ca", userID: "23l4kj"},
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
@@ -53,11 +44,8 @@ const addUserToDB = (userID, email, password) => {
 
 // Creates a new userID and creates a new user in the users database
 const createNewUser = (email, password) => {
-  // Adding hashing to passwords
   let hashedPassword = hashPassword(password);
-
   const newUserID = generateRandomString();
-  // Changed 'hashedPasswords' from 'password'
   return addUserToDB(newUserID, email, hashedPassword);
 };
 
@@ -75,7 +63,6 @@ const findUserByEmail = (email) => {
       return users[userid];
     }
   }
-  // Does this need a false return?
 };
 
 const hashPassword = (plaintext) => {
@@ -93,15 +80,9 @@ const compareHashes = (plaintext) => {
   return false;
 };
 
-
-
-
 // Return StatusCode 400 if email or password is blank
 // Implemented within the register POST in express_server.js
-// This func is not needed atm, but the program breaks when it is removed.
 const validateCreds = (userObj) => {
-  console.log("TESTING: ", userObj)
-  console.log("TESTING: ", userObj.email)
   const user_id = userObj.id;
   if (user_id) {
     if (!userObj.email || !userObj.password) {
@@ -116,7 +97,6 @@ const validateCreds = (userObj) => {
 const addNewUrlToUser = (longURL, userID) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = {longURL, userID, shortURL};
-  // This return statement might need work
   return urlDatabase[shortURL];
 };
 
@@ -126,7 +106,6 @@ const addNewURL = (longURL) => {
   return shortURL;
 };
 
-// TESTING
 const editURL = (shortURL, longURL) => {
   const newShortURL = longURL;
   urlDatabase[shortURL] = newShortURL;
