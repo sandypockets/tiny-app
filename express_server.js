@@ -31,10 +31,11 @@ app.get("/users.json", (req, res) => {
 
 // List of URLs
 app.get("/urls", (req, res) => {
-  const user_id = req.session['user_id'];
+  let user_id = req.session['user_id'];
   if (user_id) {
-    const userObj = findUserById(user_id.id);
-    const templateVars = { urls: urlDatabase, userObj: userObj};
+    userObj = findUserById(user_id);
+    //let user_id = userObj;
+    const templateVars = { urls: urlDatabase, userObj: userObj, user_id};
     res.render("urls_index", templateVars);
     return;
   } else {
@@ -46,7 +47,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const user_id = req.session['user_id'];
   //const user_id = req.body.user_id;
-  const userObj = findUserById(user_id.id);
+  const userObj = findUserById(user_id);
   const templateVars = { urls: urlDatabase, userObj: userObj};
   res.render("urls_new", templateVars);
 });
@@ -97,7 +98,8 @@ app.get("/logout", (req, res) => {
 
 // Sign Up page
 app.get("/register", (req, res) => {
-  const user_id = req.body.user_id;
+  //const user_id = req.body.user_id;
+  const user_id = req.session['user_id'];
   const userObj = findUserById(user_id);
   const templateVars = {userObj: userObj};
   res.render("register", templateVars);
@@ -106,7 +108,7 @@ app.get("/register", (req, res) => {
 /// ROUTES - POST ///
 // Create new shortURL - unique to each user
 app.post("/urls", (req, res) => {
-  const id = addNewUrlToUser(req.body.longURL, req.session['user_id'].id);
+  const id = addNewUrlToUser(req.body.longURL, req.session['user_id']);
   res.redirect(`/urls/${id.shortURL}`);
 });
 
@@ -147,11 +149,9 @@ app.post("/register", (req, res) => {
   };
   let userObj = createNewUser(username, password);
   let userKeys = Object.keys(users);
-  console.log("166", userKeys)
   let newUserPosition = userKeys.length - 1;
   let user_id = userKeys[newUserPosition];
   req.session['user_id'] = user_id;
-  console.log("160", req.session.user_id);
   res.redirect('/urls');
 });
 
@@ -160,9 +160,10 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   let userEmail = req.body.username;
   let userPassword = req.body.password;
-  let userObj;
-  let user_id = findUserByEmail(userEmail);
-  if (userEmail === user_id.email) {
+  //let userObj;
+  let userObj = findUserByEmail(userEmail);
+  let user_id = userObj.id;
+  if (userEmail === userObj.email) {
     if (compareHashes(userPassword)) {
         req.session['user_id'] = user_id;
         userObj = user_id;
