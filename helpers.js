@@ -23,7 +23,7 @@ const users = {
   "23l4kj": {
     id: "23l4kj",
     email: "test@test.com",
-    password: "test"
+    password: "$2a$10$HhuQ.M.7Y1ssk5azoKSNuuvkFVLTLDxokrAru0vJezITbAlW0UHbK"
   }
 }
 
@@ -33,7 +33,6 @@ function generateRandomString() {
   return randomString;
 };
 
-// Adds a user to the users database
 const addUserToDB = (userID, email, password) => {
   return users[userID] = {
     id: userID, 
@@ -42,7 +41,7 @@ const addUserToDB = (userID, email, password) => {
   };
 };
 
-// Creates a new userID and creates a new user in the users database
+// Creates userID and adds user to db
 const createNewUser = (email, password) => {
   let hashedPassword = hashPassword(password);
   const newUserID = generateRandomString();
@@ -51,7 +50,6 @@ const createNewUser = (email, password) => {
 
 // Find a user by their user_ID cookie value
 const findUserById = (user_id) => {
-  //const user_ID = req.body.user_ID;
   const user = users[user_id];
   return user;
 };
@@ -65,32 +63,16 @@ const findUserByEmail = (email) => {
   }
 };
 
+const salt = bcrypt.genSaltSync(10);
 const hashPassword = (plaintext) => {
-  const salt = bcrypt.genSaltSync(10);
   const hash = bcrypt.hashSync(plaintext, salt);
   return hash;
 };
 
-const compareHashes = (plaintext) => {
-  const salt = bcrypt.genSaltSync(10);
-  const hash = bcrypt.hashSync(plaintext, salt);
-  if (bcrypt.compareSync(plaintext, hash)) {
-    return true;
-  }
-  return false;
-};
-
-// Return StatusCode 400 if email or password is blank
-// Implemented within the register POST in express_server.js
-const validateCreds = (userObj) => {
-  const user_id = userObj.id;
-  if (user_id) {
-    if (!userObj.email || !userObj.password) {
-      return false;
-    } else {
-      return true;
-    }
-  }
+const compareHashes = (plaintext, userIdent) => {
+  const user_id = userIdent;
+  const hash = users[user_id]['password'];
+  return bcrypt.compareSync(plaintext, hash);
 };
 
 // Add new URL to user - testing in REPL
@@ -100,16 +82,4 @@ const addNewUrlToUser = (longURL, userID) => {
   return urlDatabase[shortURL];
 };
 
-const addNewURL = (longURL) => {
-  const shortURL = generateRandomString();
-  urlDatabase[shortURL] = longURL;
-  return shortURL;
-};
-
-const editURL = (shortURL, longURL) => {
-  const newShortURL = longURL;
-  urlDatabase[shortURL] = newShortURL;
-  return shortURL;
-};
-
-module.exports = {urlDatabase, generateRandomString, addNewURL, editURL, users, createNewUser, findUserByCookie: findUserById, validateCreds, findUserByEmail, addNewUrlToUser, hashPassword, compareHashes};
+module.exports = {urlDatabase, users, createNewUser, findUserById, findUserByEmail, addNewUrlToUser, compareHashes};
