@@ -1,12 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
-const bcrypt = require('bcryptjs');
 const cookieSession = require('cookie-session');
-
 const app = express();
 const PORT = 8080;
-const {generateRandomString, addNewURL, editURL, urlDatabase, users, createNewUser, findUserByCookie: findUserById, validateCreds, findUserByEmail, addNewUrlToUser, hashPassword, compareHashes} = require('./helpers')
+const {urlDatabase, users, createNewUser, findUserById, findUserByEmail, addNewUrlToUser, compareHashes} = require('./helpers')
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
@@ -19,22 +17,23 @@ app.use(cookieSession({
 
 
 /// ROUTES - GET ///
-// .json of URLs for debugging
+// .json of URLs and users for debugging
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
-
-// .json of users for debugging
 app.get("/users.json", (req, res) => {
   res.json(users);
 })
+
+app.get("/", (req, res) => {
+  res.redirect('login');
+});
 
 // List of URLs
 app.get("/urls", (req, res) => {
   let user_id = req.session['user_id'];
   if (user_id) {
     userObj = findUserById(user_id);
-    //let user_id = userObj;
     const templateVars = { urls: urlDatabase, userObj: userObj, user_id};
     res.render("urls_index", templateVars);
     return;
@@ -127,7 +126,7 @@ app.post("/urls/:id", (req, res) => {
 
 // EDIT SHORTURL
 app.post("/urls/:shortURL/edit", (req, res) => {
-  const user_id = req.session.user_id.id;
+  const user_id = req.session['user_id'];
   const shortURL = req.params.shortURL;
   urlDatabase[shortURL] = {
     shortURL: shortURL,
@@ -147,7 +146,7 @@ app.post("/register", (req, res) => {
     res.status(400);
     res.send("Status: 400 - Invalid entry. Please enter a valid username or password.");
   };
-  let userObj = createNewUser(username, password);
+  createNewUser(username, password);
   let userKeys = Object.keys(users);
   let newUserPosition = userKeys.length - 1;
   let user_id = userKeys[newUserPosition];
@@ -160,23 +159,22 @@ app.post("/register", (req, res) => {
 app.post("/login", (req, res) => {
   let userEmail = req.body.username;
   let userPassword = req.body.password;
-  //let userObj;
   let userObj = findUserByEmail(userEmail);
-  let user_id = userObj.id;
-  if (userEmail === userObj.email) {
-    if (compareHashes(userPassword)) {
+  if (userObj) {
+    if (userEmail === userObj.email) {
+      let user_id = userObj.id;
+      if (compareHashes(userPassword, user_id)) {
         req.session['user_id'] = user_id;
-        userObj = user_id;
-      } else {
-        res.status(403);
-        res.send("403: Incorrect email or password.");
+        res.redirect('/urls');
       }
     }
-    res.redirect('/urls');
+  } 
+  res.status(403);
+  res.send("403: Incorrect email or password");
 });
-  
+
 
 // UTIL - Server listening
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
+  console.log(`Express server (Tiny App) listening on port ${PORT}`);
 });
