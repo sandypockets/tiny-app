@@ -45,7 +45,6 @@ app.get("/urls", (req, res) => {
 // Page to create new URL
 app.get("/urls/new", (req, res) => {
   const user_id = req.session['user_id'];
-  //const user_id = req.body.user_id;
   const userObj = findUserById(user_id);
   const templateVars = { urls: urlDatabase, userObj: userObj};
   res.render("urls_new", templateVars);
@@ -53,18 +52,28 @@ app.get("/urls/new", (req, res) => {
 
 // Display new shortURL
 app.get("/urls/:shortURL", (req, res) => {
-  const user_id = req.body.user_id;
+  const user_id = req.session['user_id'];
   const userObj = findUserById(user_id);
+  const shortURL = req.params.shortURL;
   const templateVars = { urls: urlDatabase, shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, userObj: userObj};
-  res.render("urls_show", templateVars);
+  if (user_id === urlDatabase[shortURL].userID) {
+    res.render("urls_show", templateVars);
+  };
+  res.status(400);
+  res.send("You do not have permission to view this URL.")
 });
 
 // Short URL Edit page
 app.get("/urls/:shortURL/edit", (req, res) => {
-  const user_id = req.body.user_id;
+  const user_id = req.session['user_id'];
   const userObj = findUserById(user_id);
+  const shortURL = req.params.shortURL;
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, userObj: userObj}
-  res.render("urls_show", templateVars);
+  if (user_id === urlDatabase[shortURL].userID) {
+    res.render("urls_show", templateVars);
+  }
+  res.status(400);
+  res.send("You do not have permission to view this URL.")
 });
 
 // Allow shortURLs to be followed to the actual long URL
@@ -121,6 +130,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   const shortURL = req.params.id;
   urlDatabase[shortURL] = req.body.newURL;
+
   res.redirect('/urls');
 });
 
@@ -128,14 +138,17 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls/:shortURL/edit", (req, res) => {
   const user_id = req.session['user_id'];
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = {
-    shortURL: shortURL,
-    longURL: req.body.longURL,
-    userID: user_id
+  if (user_id === urlDatabase[shortURL].userID) {
+    urlDatabase[shortURL] = {
+      shortURL: shortURL,
+      longURL: req.body.longURL,
+      userID: user_id
+    };
+    res.redirect(`/urls/${shortURL}/edit`);
   };
-  res.redirect(`/urls/${shortURL}/edit`);
+  res.status(400);
+  res.send("You do not have permission to edit this URL.")
 });
-
 
 /// SIGNUP & AUTHENTICATION ///
 // REGISTER
@@ -157,7 +170,6 @@ app.post("/register", (req, res) => {
   req.session['user_id'] = user_id;
   res.redirect('/urls');
 });
-
 
 // LOGIN & SET COOKIE
 app.post("/login", (req, res) => {
