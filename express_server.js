@@ -146,6 +146,10 @@ app.post("/register", (req, res) => {
     res.status(400);
     res.send("Status: 400 - Invalid entry. Please enter a valid username or password.");
   };
+  if (findUserByEmail(username)) {
+    res.status(400);
+    res.send("Status: 400 - Invalid entry. User already exists.");  
+  };
   createNewUser(username, password);
   let userKeys = Object.keys(users);
   let newUserPosition = userKeys.length - 1;
