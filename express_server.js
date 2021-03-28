@@ -47,7 +47,10 @@ app.get("/urls/new", (req, res) => {
   const user_id = req.session['user_id'];
   const userObj = findUserById(user_id);
   const templateVars = { urls: urlDatabase, userObj: userObj};
-  res.render("urls_new", templateVars);
+  if (user_id) {
+    res.render("urls_new", templateVars);
+  }
+  res.redirect("/login");
 });
 
 // Display new shortURL
