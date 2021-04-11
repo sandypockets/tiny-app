@@ -1,0 +1,9 @@
+#custom-login-form.custom-login-form {
+    width: 80%;
+}
+
+.form-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 4em;
+}
