@@ -27,7 +27,7 @@
             <!-- Display URLs only if logged in and created by that user -->
             <% if (urls[url].userID === user_id) { %>
             <td><a href="<%- urls[url].longURL %>"><%= url %></a></td>
-            <td><%= urls[url].longURL %></td>
+            <td><a href="<%- urls[url].longURL %>"><%= urls[url].longURL %></a></td>
             <td>
               <form method="GET" action="/urls/<%= url %>/edit">
                 <input class="btn btn-outline-primary" type="submit" value="edit">
