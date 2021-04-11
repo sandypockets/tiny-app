@@ -2,12 +2,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const cookieSession = require('cookie-session');
+const path = require('path');
 const app = express();
 const PORT = 8080;
 const {urlDatabase, users, createNewUser, findUserById, findUserByEmail, addNewUrlToUser, compareHashes} = require('./helpers')
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public/javascript')));
 app.use(morgan('short'));
 app.use(cookieSession({
   name: 'session',
