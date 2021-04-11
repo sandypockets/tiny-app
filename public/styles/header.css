@@ -1,0 +1,11 @@
+#nav-btn-wrap.nav-btn-wrap.nav-btn-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+#navbar-items {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
